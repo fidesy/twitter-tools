@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: twitterdb
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "28912:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    container_name: twitter-bot
+    build: ./
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
