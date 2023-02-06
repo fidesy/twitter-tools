@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/fidesy/twitter-tools/internal/models"
 	"github.com/g8rswimmer/go-twitter/v2"
-	"strings"
 )
 
 func (s *Service) GetFollowings(ctx context.Context, username string) ([]*models.Following, error) {
@@ -24,7 +23,7 @@ func (s *Service) GetFollowings(ctx context.Context, username string) ([]*models
 	for i, u := range resp.Raw.Users {
 		followings[i] = &models.Following{
 			UserID:            user.ID,
-			Username:          strings.ToLower(username),
+			Username:          username,
 			FollowingID:       u.ID,
 			FollowingUsername: u.UserName,
 		}

@@ -35,9 +35,6 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 		}
 
 		prettyTop += fmt.Sprintf("\n\n<b>%d. %s (%d)</b>\nTop followers: ", ind+1, user.Username, following.Amount)
-		if len(topFollowers) > 5 {
-			topFollowers = topFollowers[:5]
-		}
 		for _, top := range topFollowers {
 			prettyTop += fmt.Sprintf("<b>%s</b> ", top)
 		}

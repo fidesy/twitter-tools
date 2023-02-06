@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	insertActionQuery   = "INSERT INTO actions VALUES(:time, :type, :username, :target_username)"
+	insertActionQuery   = "INSERT INTO actions VALUES(:time, :type, LOWER(:username), LOWER(:target_username))"
 	selectTopFollowings = `
 		SELECT target_username, COUNT(*) AS amount FROM actions
 		WHERE type='follow' AND time > $1
@@ -17,7 +17,7 @@ const (
 	selectTopFollowers = `
     	SELECT DISTINCT actions.username FROM actions
     	JOIN users ON actions.username=users.username
-		WHERE actions.type='follow' AND actions.target_username=$1 AND actions.time > $2
+		WHERE actions.type='follow' AND actions.target_username=LOWER($1) AND actions.time > $2
 		ORDER BY users.followers DESC
 		LIMIT 5
 	`
