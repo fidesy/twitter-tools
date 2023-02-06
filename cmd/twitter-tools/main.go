@@ -6,30 +6,16 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strings"
 )
-
-var twitters = []string{
-	"paradigm",
-	"FEhrsam",
-	"_charlienoyes",
-	"RSSH273",
-	"a16z",
-	"alive_eth",
-	"eddylazzarin",
-	"Sequoia",
-	"Delphi_Digital",
-	"blockchaincap",
-	"wbrads",
-	"brian_armstrong",
-	"zxocw",
-	"BinanceLabs",
-	"tmlee",
-	"tferriss",
-}
 
 func main() {
 	err := godotenv.Load()
 	checkError(err)
+
+	var twitters []string
+	bytes, _ := os.ReadFile("twitters.txt")
+	twitters = strings.Split(string(bytes), "\n")
 
 	s, err := service.New(&service.Config{
 		BearerToken: os.Getenv("BEARER_TOKEN"),
@@ -37,10 +23,11 @@ func main() {
 		DBURL:       os.Getenv("DB_URL"),
 	})
 	checkError(err)
+	defer s.CloseDatabase()
 
 	var actions = make(chan string, 10)
 
-	go s.MonitorFollowings(actions, twitters)
+	go s.TrackFollowings(actions, twitters)
 
 	bot, err := telegrambot.New(os.Getenv("TG_BOT_TOKEN"), s)
 	checkError(err)

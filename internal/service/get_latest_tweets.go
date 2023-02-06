@@ -7,12 +7,12 @@ import (
 )
 
 func (s *Service) GetLatestTweets(ctx context.Context, username string) ([]*twitter.TweetObj, error) {
-	userID, err := s.GetIDByUsername(ctx, username)
+	user, err := s.GetUserByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := s.client.UserTweetTimeline(ctx, userID, twitter.UserTweetTimelineOpts{})
+	resp, err := s.client.UserTweetTimeline(ctx, user.ID, twitter.UserTweetTimelineOpts{})
 	if err != nil {
 		return nil, err
 	}

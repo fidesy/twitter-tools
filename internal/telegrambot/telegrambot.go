@@ -1,11 +1,18 @@
 package telegrambot
 
 import (
+	"context"
 	"github.com/fidesy/twitter-tools/internal/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strings"
 )
+
+const greetingMessage = "Welcome to FundInsightsBot. \nHere are available commands:" +
+	"\n\n\t/subscribe - get notifications about follows" +
+	"\n\t/unsubscribe - disable notifications about follows" +
+	"\n\t/top - get top follows for the last 24hours." +
+	"\n\nCurrently bot is tracking 200+ twitter accounts."
 
 type TelegramBot struct {
 	bot  *tgbotapi.BotAPI
@@ -48,10 +55,25 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 			messageTextSplit := strings.Split(update.Message.Text, " ")
 			switch messageTextSplit[0] {
 			case "/start":
+				tg.sendMessage(chatID, greetingMessage)
+			case "/subscribe":
 				chatIDs[chatID] = true
 				tg.sendMessage(chatID, "You are successfully subscribed on notifications!")
-			case "/followings":
-				tg.sendMessage(chatID, "Nothing to send.")
+			case "/unsubscribe":
+				if _, ok := chatIDs[chatID]; ok {
+					delete(chatIDs, chatID)
+					tg.sendMessage(chatID, "You are successfully unsubscribed on notifications!")
+					return
+				}
+				tg.sendMessage(chatID, "You are not subscribed on notifications!")
+			case "/top":
+				result, err := tg.serv.GetTopFollowings(context.Background())
+				if err != nil {
+					tg.sendMessage(chatID, "error:"+err.Error())
+					return
+				}
+
+				tg.sendMessage(chatID, result)
 
 			default:
 				tg.sendMessage(chatID, "unknown command")

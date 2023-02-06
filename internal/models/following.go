@@ -1,11 +1,9 @@
 package models
 
-import "gorm.io/gorm"
-
 type Following struct {
-	gorm.Model
-	UserID            string
-	Username          string
-	FollowingID       string
-	FollowingUsername string
+	ID                int    `db:"id"`
+	UserID            string `db:"user_id"`
+	Username          string `db:"username"`
+	FollowingID       string `db:"following_id"`
+	FollowingUsername string `db:"following_username"`
 }

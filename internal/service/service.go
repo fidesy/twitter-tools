@@ -1,11 +1,10 @@
 package service
 
 import (
+	"context"
 	"fmt"
-	"github.com/fidesy/twitter-tools/internal/models"
+	"github.com/fidesy/twitter-tools/internal/postgresql"
 	"github.com/g8rswimmer/go-twitter/v2"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"net/http"
 	"net/url"
 )
@@ -26,7 +25,7 @@ type Config struct {
 
 type Service struct {
 	client *twitter.Client
-	db     *gorm.DB
+	db     *postgresql.PostgreSQL
 }
 
 func New(config *Config) (*Service, error) {
@@ -50,25 +49,15 @@ func New(config *Config) (*Service, error) {
 	}
 	s.client = client
 
-	err = s.configureDatabase(config.DBURL)
-	if err != nil {
+	db := postgresql.New()
+	if err = db.Open(context.Background(), config.DBURL); err != nil {
 		return nil, err
 	}
+	s.db = db
 
 	return s, nil
 }
 
-func (s *Service) configureDatabase(dbURL string) error {
-	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	db.AutoMigrate(models.Tweet{})
-	db.AutoMigrate(models.User{})
-	db.AutoMigrate(models.Following{})
-
-	s.db = db
-
-	return nil
+func (s *Service) CloseDatabase() {
+	s.db.Close()
 }

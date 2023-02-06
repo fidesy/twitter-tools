@@ -2,54 +2,46 @@ package service
 
 import (
 	"context"
-	"github.com/fidesy/twitter-tools/internal/models"
+	"log"
 )
 
-func (s *Service) GetFollowingActions(ctx context.Context, username string) ([]string, []string, error) {
-	var dbFollowings = make([]*models.Following, 0)
-	s.db.Find(&dbFollowings, models.Following{Username: username})
-
+func (s *Service) GetNewFollowings(ctx context.Context, username string) ([]string, error) {
 	currentFollowings, err := s.GetFollowings(ctx, username)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	s.db.Unscoped().Where("username = ?", username).Delete(&models.Following{})
-	for _, following := range currentFollowings {
-		s.db.Create(following)
+	dbFollowings, err := s.db.GetFollowingsByUsername(ctx, username)
+	if err != nil {
+		return nil, err
 	}
 
 	if len(dbFollowings) == 0 {
-		return nil, nil, nil
+		for _, following := range currentFollowings {
+			err = s.db.AddFollowing(context.Background(), following)
+			if err != nil {
+				log.Printf("error adding following: %s", err.Error())
+			}
+		}
+		return []string{}, nil
 	}
 
-	// fill in map with an old followings
-	var oldFollowings = make(map[string]bool, len(dbFollowings))
+	// fill in hashmap with all followings from the database
+	var followings = make(map[string]bool)
 	for _, following := range dbFollowings {
-		oldFollowings[following.FollowingID] = true
+		followings[following.FollowingUsername] = true
 	}
 
-	// fill in map with a current followings
-	var currentFollowings_ = make(map[string]bool, len(currentFollowings))
+	var newFollowings []string
 	for _, following := range currentFollowings {
-		currentFollowings_[following.FollowingID] = true
-	}
-
-	// find new followings
-	var newFollowings = make([]string, 0)
-	for _, following := range currentFollowings {
-		if _, ok := oldFollowings[following.FollowingID]; !ok {
+		if _, ok := followings[following.FollowingUsername]; !ok {
 			newFollowings = append(newFollowings, following.FollowingUsername)
+			err = s.db.AddFollowing(context.Background(), following)
+			if err != nil {
+				log.Printf("error adding following: %s", err.Error())
+			}
 		}
 	}
 
-	// find deleted followings
-	var deletedFollowings = make([]string, 0)
-	for _, following := range dbFollowings {
-		if _, ok := currentFollowings_[following.FollowingID]; !ok {
-			deletedFollowings = append(deletedFollowings, following.FollowingUsername)
-		}
-	}
-
-	return newFollowings, deletedFollowings, nil
+	return newFollowings, nil
 }

@@ -18,5 +18,6 @@ WORKDIR /app
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/main /usr/bin/
+COPY --from=builder /app/twitters.txt ./
 
 CMD [ "main" ]

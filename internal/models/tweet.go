@@ -1,10 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Tweet struct {
-	gorm.Model
-	ID             int
+	ID             string
 	AuthorID       string
 	AuthorUsername string
 	Text           string
