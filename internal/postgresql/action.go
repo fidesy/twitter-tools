@@ -13,9 +13,10 @@ const (
 		WHERE type='follow' AND time > $1
 		GROUP BY target_username
 		ORDER BY COUNT(*)
+		LIMIT 10
 		`
 	selectTopFollowers = `
-    	SELECT DISTINCT actions.username FROM actions
+    	SELECT actions.username FROM actions
     	JOIN users ON actions.username=users.username
 		WHERE actions.type='follow' AND actions.target_username=LOWER($1) AND actions.time > $2
 		ORDER BY users.followers DESC

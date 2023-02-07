@@ -6,16 +6,11 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"strings"
 )
 
 func main() {
 	err := godotenv.Load()
 	checkError(err)
-
-	var twitters []string
-	bytes, _ := os.ReadFile("twitters.txt")
-	twitters = strings.Split(string(bytes), "\n")
 
 	s, err := service.New(&service.Config{
 		BearerToken: os.Getenv("BEARER_TOKEN"),
@@ -27,7 +22,7 @@ func main() {
 
 	var actions = make(chan string, 10)
 
-	go s.TrackFollowings(actions, twitters)
+	go s.TrackFollowings(actions)
 
 	bot, err := telegrambot.New(os.Getenv("TG_BOT_TOKEN"), s)
 	checkError(err)

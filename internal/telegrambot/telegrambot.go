@@ -74,6 +74,31 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 				}
 
 				tg.sendMessage(chatID, result)
+			case "/deleteabc":
+				if len(messageTextSplit) < 2 {
+					tg.sendMessage(chatID, "please provide username to delete")
+					return
+				}
+				err := tg.serv.DeleteUser(context.Background(), messageTextSplit[1])
+				if err != nil {
+					tg.sendMessage(chatID, "error while deleting user: "+err.Error())
+					return
+				}
+
+				tg.sendMessage(chatID, "Successfully deleted user.")
+			case "/addabc":
+				if len(messageTextSplit) < 2 {
+					tg.sendMessage(chatID, "please provide username to add")
+					return
+				}
+
+				err := tg.serv.AddUser(context.Background(), messageTextSplit[1])
+				if err != nil {
+					tg.sendMessage(chatID, "error while adding user: "+err.Error())
+					return
+				}
+
+				tg.sendMessage(chatID, "Successfully added user.")
 
 			default:
 				tg.sendMessage(chatID, "unknown command")

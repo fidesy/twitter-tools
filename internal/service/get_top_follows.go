@@ -19,7 +19,7 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 	}
 
 	if len(topFollowings) == 0 {
-		return "", errors.New("no data, try later")
+		return "", errors.New(" no data, try later")
 	}
 
 	prettyTop := "<b>Top follows:</b>"
@@ -34,9 +34,11 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 			return "", err
 		}
 
-		prettyTop += fmt.Sprintf("\n\n<b>%d. %s (%d)</b>\nTop followers: ", ind+1, user.Username, following.Amount)
+		prettyTop += "\n\n" + fmt.Sprintf(`<b>%d. <a href="https://twitter.com/%s">%s</a> (%d)</b>`,
+			ind+1, user.Username, user.Username, following.Amount) + "\nTop followers: "
+
 		for _, top := range topFollowers {
-			prettyTop += fmt.Sprintf("<b>%s</b> ", top)
+			prettyTop += fmt.Sprintf(`<a href="https://twitter.com/%s"><b>%s</b></a>`, top, top)
 		}
 	}
 

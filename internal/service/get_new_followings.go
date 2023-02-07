@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"strings"
 )
 
 func (s *Service) GetNewFollowings(ctx context.Context, username string) ([]string, error) {
@@ -34,6 +35,7 @@ func (s *Service) GetNewFollowings(ctx context.Context, username string) ([]stri
 
 	var newFollowings []string
 	for _, following := range currentFollowings {
+		following.FollowingUsername = strings.ToLower(following.FollowingUsername)
 		if _, ok := followings[following.FollowingUsername]; !ok {
 			newFollowings = append(newFollowings, following.FollowingUsername)
 			err = s.db.AddFollowing(context.Background(), following)
