@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS users(
 	following INT,
 	followers INT,
 	tweets INT,
-	is_tracked BOOLEAN            
+	is_tracked BOOLEAN,
+	latest_ping TIMESTAMP         
 );
 
 CREATE TABLE IF NOT EXISTS followings(

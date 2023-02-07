@@ -38,7 +38,7 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 			ind+1, user.Username, user.Username, following.Amount) + "\nTop followers: "
 
 		for _, top := range topFollowers {
-			prettyTop += fmt.Sprintf(`<a href="https://twitter.com/%s"><b>%s</b></a>`, top, top)
+			prettyTop += fmt.Sprintf(`<a href="https://twitter.com/%s"><b> %s</b></a>`, top, top)
 		}
 	}
 

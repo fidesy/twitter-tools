@@ -12,7 +12,7 @@ const greetingMessage = "Welcome to FundInsightsBot. \nHere are available comman
 	"\n\n\t/subscribe - get notifications about follows" +
 	"\n\t/unsubscribe - disable notifications about follows" +
 	"\n\t/top - get top follows for the last 24hours." +
-	"\n\nCurrently bot is tracking 200+ twitter accounts."
+	"\n\nCurrently bot is tracking 350+ twitter accounts."
 
 type TelegramBot struct {
 	bot  *tgbotapi.BotAPI

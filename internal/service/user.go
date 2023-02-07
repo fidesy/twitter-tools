@@ -1,6 +1,9 @@
 package service
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 func (s *Service) DeleteUser(ctx context.Context, username string) error {
 	err := s.db.DeleteUser(ctx, username)
@@ -13,6 +16,7 @@ func (s *Service) AddUser(ctx context.Context, username string) error {
 		return err
 	}
 	user.IsTracked = true
+	user.LatestPing = time.Now().Add(-time.Hour * 24).UTC()
 
 	err = s.db.UpdateUserTrackField(ctx, user)
 	return err

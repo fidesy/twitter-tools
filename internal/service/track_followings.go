@@ -9,22 +9,12 @@ import (
 )
 
 func (s *Service) TrackFollowings(actions chan<- string) {
-	var (
-		usernames = []string{}
-		err       error
-	)
-
-	for _ = range time.Tick(time.Minute) {
-		if len(usernames) == 0 {
-			usernames, err = s.db.GetUsersForTracking(context.Background())
-			if err != nil {
-				log.Println("error fetching new users for tracking:", err.Error())
-			}
-			log.Println("Users to track:", len(usernames))
+	for {
+		username, err := s.db.GetUsernameToPing(context.Background())
+		if err != nil {
+			log.Println("error getting username to ping:", err.Error())
+			continue
 		}
-
-		username := usernames[0]
-		usernames = usernames[1:]
 
 		go func() {
 			newFollowings, err := s.GetNewFollowings(context.Background(), username)
@@ -47,5 +37,7 @@ func (s *Service) TrackFollowings(actions chan<- string) {
 				}
 			}
 		}()
+
+		<-time.Tick(time.Minute)
 	}
 }

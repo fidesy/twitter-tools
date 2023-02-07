@@ -12,7 +12,7 @@ const (
 		SELECT target_username, COUNT(*) AS amount FROM actions
 		WHERE type='follow' AND time > $1
 		GROUP BY target_username
-		ORDER BY COUNT(*)
+		ORDER BY COUNT(*) DESC
 		LIMIT 10
 		`
 	selectTopFollowers = `
