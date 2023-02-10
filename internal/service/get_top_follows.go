@@ -13,7 +13,7 @@ type Top struct {
 }
 
 func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
-	topFollowings, err := s.db.GetTopFollowings(context.Background(), time.Hour*24)
+	topFollowings, err := s.db.GetTopFollowings(context.Background(), time.Hour*24, 10)
 	if err != nil {
 		return "", err
 	}
@@ -29,7 +29,7 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 			return "", err
 		}
 
-		topFollowers, err := s.db.GetTopFollowers(ctx, user.Username, time.Hour*24)
+		topFollowers, err := s.db.GetTopFollowers(ctx, user.Username, time.Hour*24, 5)
 		if err != nil {
 			return "", err
 		}

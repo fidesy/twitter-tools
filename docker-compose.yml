@@ -17,6 +17,7 @@ services:
   app:
     container_name: twitter-bot
     build: ./
+    restart: always
     env_file:
       - .env
     depends_on:

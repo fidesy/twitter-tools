@@ -18,6 +18,6 @@ func (s *Service) AddUser(ctx context.Context, username string) error {
 	user.IsTracked = true
 	user.LatestPing = time.Now().Add(-time.Hour * 24).UTC()
 
-	err = s.db.UpdateUserTrackField(ctx, user)
+	err = s.db.UpdateUser(ctx, user)
 	return err
 }

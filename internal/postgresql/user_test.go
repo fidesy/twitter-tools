@@ -32,7 +32,7 @@ func TestGetUserByUsername(t *testing.T) {
 
 func TestUpdateUserTrackField(t *testing.T) {
 	user.IsTracked = true
-	err := userDB.UpdateUserTrackField(context.Background(), user)
+	err := userDB.UpdateUser(context.Background(), user)
 	assert.Nil(t, err)
 
 	u, err := userDB.GetUserByUsername(context.Background(), user.Username)
@@ -42,4 +42,3 @@ func TestUpdateUserTrackField(t *testing.T) {
 
 	userDB.Close()
 }
-

@@ -24,8 +24,8 @@ func (s *Service) TrackFollowings(actions chan<- string) {
 
 			for _, followingUsername := range newFollowings {
 				actions <- fmt.Sprintf(
-					`<a href="https://twitter.com/%s"><b>%s</b></a> follows <a href="https://twitter.com/%s"><b>%s</b></a>\n`,
-					username, username, followingUsername, followingUsername)
+					`<a href="https://twitter.com/%s"><b>%s</b></a> follows <a href="https://twitter.com/%s"><b>%s</b></a>`,
+					username, username, followingUsername, followingUsername) + "\n"
 				err := s.db.AddAction(context.Background(), &models.Action{
 					Time:           time.Now(),
 					Type:           "follow",

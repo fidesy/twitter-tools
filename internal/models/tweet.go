@@ -1,8 +1,8 @@
 package models
 
 type Tweet struct {
-	ID             string
-	AuthorID       string
-	AuthorUsername string
-	Text           string
+	ID             string `db:"id"`
+	AuthorID       string `db:"author_id"`
+	AuthorUsername string `db:"author_username"`
+	Text           string `db:"text"`
 }

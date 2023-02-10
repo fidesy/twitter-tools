@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/fidesy/twitter-tools/internal/models"
 	"github.com/g8rswimmer/go-twitter/v2"
+	"time"
 )
 
 func (s *Service) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
@@ -39,6 +40,7 @@ func (s *Service) GetUserByUsername(ctx context.Context, username string) (*mode
 		Followers:       u.PublicMetrics.Followers,
 		Tweets:          u.PublicMetrics.Tweets,
 		IsTracked:       false,
+		LatestPing:      time.Now(),
 	}
 	s.db.AddUser(ctx, user)
 

@@ -2,8 +2,8 @@ package postgresql
 
 import (
 	"context"
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 type PostgreSQL struct {
@@ -45,12 +45,12 @@ CREATE TABLE IF NOT EXISTS actions(
 );`
 
 func (p *PostgreSQL) Open(ctx context.Context, dbURL string) error {
-	db, err := sqlx.ConnectContext(ctx, "postgres", dbURL)
+	db, err := sqlx.ConnectContext(ctx, "pgx", dbURL)
 	if err != nil {
 		return err
 	}
 
-	if err := db.PingContext(ctx); err != nil {
+	if err = db.PingContext(ctx); err != nil {
 		return err
 	}
 
@@ -59,7 +59,6 @@ func (p *PostgreSQL) Open(ctx context.Context, dbURL string) error {
 	}
 
 	p.db = db
-
 	return nil
 }
 

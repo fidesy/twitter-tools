@@ -1,6 +1,6 @@
 package models
 
-type TopFollowings struct {
+type TopFollowing struct {
 	Username string `db:"target_username"`
 	Amount   int    `db:"amount"`
 }

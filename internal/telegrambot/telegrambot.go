@@ -12,7 +12,7 @@ const greetingMessage = "Welcome to FundInsightsBot. \nHere are available comman
 	"\n\n\t/subscribe - get notifications about follows" +
 	"\n\t/unsubscribe - disable notifications about follows" +
 	"\n\t/top - get top follows for the last 24hours." +
-	"\n\nCurrently bot is tracking 350+ twitter accounts."
+	"\n\nCurrently bot is tracking 250+ twitter accounts."
 
 type TelegramBot struct {
 	bot  *tgbotapi.BotAPI
@@ -48,6 +48,10 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 
 	for update := range updates {
 		update := update
+		if update.Message == nil {
+			continue
+		}
+
 		log.Printf("New message from %s: %s\n", update.Message.From.UserName, update.Message.Text)
 		go func() {
 			chatID := update.Message.Chat.ID
