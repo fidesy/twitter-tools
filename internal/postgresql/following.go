@@ -21,7 +21,7 @@ func (p *PostgreSQL) GetFollowingsByUsername(ctx context.Context, username strin
 }
 
 func (p *PostgreSQL) AddFollowing(ctx context.Context, following *models.Following) error {
-	_, err := p.db.ExecContext(
+	_, err := p.db.NamedExecContext(
 		ctx,
 		"INSERT INTO followings(user_id, username, following_id, following_username) VALUES(:user_id, LOWER(:username), :following_id, LOWER(:following_username))",
 		following,

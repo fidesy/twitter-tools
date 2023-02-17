@@ -8,11 +8,12 @@ import (
 	"strings"
 )
 
-const greetingMessage = "Welcome to FundInsightsBot. \nHere are available commands:" +
-	"\n\n\t/subscribe - get notifications about follows" +
-	"\n\t/unsubscribe - disable notifications about follows" +
-	"\n\t/top - get top follows for the last 24hours." +
-	"\n\nCurrently bot is tracking 250+ twitter accounts."
+const greetingMessage = "Welcome to Bot. \nHere are available commands:" +
+	"\n\n\t/subscribe - get notifications about followings" +
+	"\n\t/unsubscribe - disable notifications about followings" +
+	"\n\t/top - get top followings for the last 24hours." +
+	"\n\t/add USERNAME - add user to track" +
+	"\n\t/delete USERNAME - delete user from tracking"
 
 type TelegramBot struct {
 	bot  *tgbotapi.BotAPI
@@ -41,82 +42,94 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 	go func() {
 		for action := range actions {
 			for chatID := range chatIDs {
-				tg.sendMessage(chatID, action)
+				tg.sendMessage(tgbotapi.NewMessage(chatID, action))
 			}
 		}
 	}()
 
 	for update := range updates {
 		update := update
-		if update.Message == nil {
-			continue
-		}
-
-		log.Printf("New message from %s: %s\n", update.Message.From.UserName, update.Message.Text)
 		go func() {
-			chatID := update.Message.Chat.ID
+			if update.Message == nil {
+				return
+			}
 
-			messageTextSplit := strings.Split(update.Message.Text, " ")
-			switch messageTextSplit[0] {
-			case "/start":
-				tg.sendMessage(chatID, greetingMessage)
-			case "/subscribe":
+			if !update.Message.IsCommand() {
+				return
+			}
+
+			log.Printf("New message from %s: %s\n", update.Message.From.UserName, update.Message.Text)
+			chatID := update.Message.Chat.ID
+			msg := tgbotapi.NewMessage(chatID, "")
+
+			args := strings.Split(update.Message.Text, " ")[1:]
+			switch update.Message.Command() {
+			case "start":
+				msg.Text = greetingMessage
+
+			case "subscribe":
 				chatIDs[chatID] = true
-				tg.sendMessage(chatID, "You are successfully subscribed on notifications!")
-			case "/unsubscribe":
+				msg.Text = "You are successfully subscribed on notifications!"
+
+			case "unsubscribe":
 				if _, ok := chatIDs[chatID]; ok {
 					delete(chatIDs, chatID)
-					tg.sendMessage(chatID, "You are successfully unsubscribed on notifications!")
-					return
+					msg.Text = "You are successfully unsubscribed on notifications!"
+					break
 				}
-				tg.sendMessage(chatID, "You are not subscribed on notifications!")
-			case "/top":
+				msg.Text = "You are not subscribed on notifications!"
+
+			case "top":
 				result, err := tg.serv.GetTopFollowings(context.Background())
 				if err != nil {
-					tg.sendMessage(chatID, "error:"+err.Error())
-					return
+					msg.Text = "Error:" + err.Error()
+					break
 				}
 
-				tg.sendMessage(chatID, result)
-			case "/deleteabc":
-				if len(messageTextSplit) < 2 {
-					tg.sendMessage(chatID, "please provide username to delete")
-					return
+				msg.Text = result
+
+			case "add":
+				if len(args) < 1 {
+					msg.Text = "Please provide username to add."
+					break
 				}
-				err := tg.serv.DeleteUser(context.Background(), messageTextSplit[1])
+
+				err := tg.serv.AddUser(context.Background(), args[0])
 				if err != nil {
-					tg.sendMessage(chatID, "error while deleting user: "+err.Error())
-					return
+					msg.Text = "Error while adding user: " + err.Error()
+					break
 				}
 
-				tg.sendMessage(chatID, "Successfully deleted user.")
-			case "/addabc":
-				if len(messageTextSplit) < 2 {
-					tg.sendMessage(chatID, "please provide username to add")
-					return
+				msg.Text = "Successfully added user."
+
+			case "delete":
+				if len(args) < 1 {
+					msg.Text = "Please provide username to delete."
+					break
 				}
 
-				err := tg.serv.AddUser(context.Background(), messageTextSplit[1])
+				err := tg.serv.DeleteUser(context.Background(), args[0])
 				if err != nil {
-					tg.sendMessage(chatID, "error while adding user: "+err.Error())
-					return
+					msg.Text = "Error while deleting user: " + err.Error()
+					break
 				}
 
-				tg.sendMessage(chatID, "Successfully added user.")
+				msg.Text = "Successfully deleted user."
 
 			default:
-				tg.sendMessage(chatID, "unknown command")
+				msg.Text = "Unknown command."
 			}
+
+			tg.sendMessage(msg)
 		}()
 	}
 	return nil
 }
 
-func (tg *TelegramBot) sendMessage(chatID int64, messageText string) {
-	msg := tgbotapi.NewMessage(chatID, messageText)
+func (tg *TelegramBot) sendMessage(msg tgbotapi.MessageConfig) {
 	msg.ParseMode = "HTML"
-	_, err_ := tg.bot.Send(msg)
-	if err_ != nil {
-		log.Printf("Error: %s", err_.Error())
+	_, err := tg.bot.Send(msg)
+	if err != nil {
+		log.Println("error while sending message:", err.Error())
 	}
 }

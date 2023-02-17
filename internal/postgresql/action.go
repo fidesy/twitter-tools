@@ -9,7 +9,7 @@ import (
 func (p *PostgreSQL) AddAction(ctx context.Context, action *models.Action) error {
 	_, err := p.db.NamedExecContext(
 		ctx,
-		"INSERT INTO actions VALUES(:time, :type, LOWER(:username), LOWER(:target_username))",
+		"INSERT INTO actions(time, type, username, target_username) VALUES(:time, :type, LOWER(:username), LOWER(:target_username))",
 		action,
 	)
 

@@ -2,7 +2,7 @@ FROM golang:alpine AS builder
 
 WORKDIR /app
 
-ADD certs/domain.crt /etc/ssl/certs/
+ADD certs/client.crt /etc/ssl/certs/
 
 COPY . .
 

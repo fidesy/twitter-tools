@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS followings(
 );
 
 CREATE TABLE IF NOT EXISTS actions(
+    id SERIAL PRIMARY KEY,
     time TIMESTAMP,
     type TEXT,
     username TEXT,

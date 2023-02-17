@@ -22,7 +22,7 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 		return "", errors.New(" no data, try later")
 	}
 
-	prettyTop := "<b>Top follows:</b>"
+	prettyTop := "<b>Top followings:</b>"
 	for ind, following := range topFollowings {
 		user, err := s.GetUserByUsername(ctx, following.Username)
 		if err != nil {
