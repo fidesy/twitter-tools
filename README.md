@@ -33,7 +33,7 @@ Add, delete user from tracking list.
 git clone https://github.com/fidesy/twitter-tools.git
 ```
 
-2. Fill in variables into .env file. [Example](.env).
+2. Fill in variables into .env file. [Example](.env.example).
 
 3. Create the client certificates.
 ```
