@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -26,12 +27,16 @@ func (s *Service) GetTopFollowings(ctx context.Context) (string, error) {
 	for ind, following := range topFollowings {
 		user, err := s.GetUserByUsername(ctx, following.Username)
 		if err != nil {
-			return "", err
+			log.Println("error while getting user:", following.Username, err.Error())
+			continue
+			//return "", err
 		}
 
 		topFollowers, err := s.db.GetTopFollowers(ctx, user.Username, time.Hour*24, 5)
 		if err != nil {
-			return "", err
+			log.Println("error while getting top followers:", err.Error())
+			continue
+			//return "", err
 		}
 
 		prettyTop += "\n\n" + fmt.Sprintf(`<b>%d. <a href="https://twitter.com/%s">%s</a> (%d)</b>`,
