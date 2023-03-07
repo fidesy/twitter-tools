@@ -31,15 +31,18 @@ type Service struct {
 func New(config *Config) (*Service, error) {
 	s := &Service{}
 
-	proxy, err := url.Parse(config.RawProxy)
-	if err != nil {
-		return nil, err
-	}
+	cli := &http.Client{}
+	if config.RawProxy != "" {
+		proxy, err := url.Parse(config.RawProxy)
+		if err != nil {
+			return nil, err
+		}
 
-	cli := &http.Client{
-		Transport: &http.Transport{
-			Proxy: http.ProxyURL(proxy),
-		},
+		cli = &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxy),
+			},
+		}
 	}
 
 	client := &twitter.Client{
@@ -50,7 +53,7 @@ func New(config *Config) (*Service, error) {
 	s.client = client
 
 	db := postgresql.New()
-	if err = db.Open(context.Background(), config.DBURL); err != nil {
+	if err := db.Open(context.Background(), config.DBURL); err != nil {
 		return nil, err
 	}
 	s.db = db

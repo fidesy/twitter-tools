@@ -3,11 +3,11 @@ package postgresql
 import (
 	"context"
 	_ "github.com/jackc/pgx/stdlib"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostgreSQL struct {
-	db *sqlx.DB
+	pool *pgxpool.Pool
 }
 
 func New() *PostgreSQL {
@@ -46,23 +46,23 @@ CREATE TABLE IF NOT EXISTS actions(
 );`
 
 func (p *PostgreSQL) Open(ctx context.Context, dbURL string) error {
-	db, err := sqlx.ConnectContext(ctx, "pgx", dbURL)
+	pool, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
 		return err
 	}
 
-	if err = db.PingContext(ctx); err != nil {
+	if err = pool.Ping(ctx); err != nil {
 		return err
 	}
 
-	if _, err = db.ExecContext(ctx, initSchemas); err != nil {
+	if _, err = pool.Exec(ctx, initSchemas); err != nil {
 		return err
 	}
 
-	p.db = db
+	p.pool = pool
 	return nil
 }
 
 func (p *PostgreSQL) Close() {
-	p.db.Close()
+	p.pool.Close()
 }
