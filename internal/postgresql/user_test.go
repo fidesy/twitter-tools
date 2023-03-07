@@ -13,24 +13,24 @@ var (
 	user   = &models.User{Username: "danila"}
 )
 
-func TestOpenUserDB(t *testing.T) {
+func TestUser_OpenDatabase(t *testing.T) {
 	err := userDB.Open(context.Background(), os.Getenv("DB_URL"))
 	assert.Nil(t, err)
 }
 
-func TestAddUser(t *testing.T) {
+func TestUser_Add(t *testing.T) {
 	err := userDB.AddUser(context.Background(), user)
 	assert.Nil(t, err)
 }
 
-func TestGetUserByUsername(t *testing.T) {
+func TestUser_GetUserByUsername(t *testing.T) {
 	u, err := userDB.GetUserByUsername(context.Background(), user.Username)
 	assert.Nil(t, err)
 
 	t.Log("User:", u)
 }
 
-func TestUpdateUserTrackField(t *testing.T) {
+func TestUser_UpdateUserTrackField(t *testing.T) {
 	user.IsTracked = true
 	err := userDB.UpdateUser(context.Background(), user)
 	assert.Nil(t, err)
@@ -39,6 +39,11 @@ func TestUpdateUserTrackField(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, user.IsTracked, u.IsTracked)
+}
+
+func TestUser_Delete(t *testing.T) {
+	err := userDB.DeleteUser(context.Background(), user.Username)
+	assert.Nil(t, err)
 
 	userDB.Close()
 }

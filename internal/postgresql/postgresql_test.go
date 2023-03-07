@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestOpenPostgres(t *testing.T) {
+func TestPostgreSQL_Open(t *testing.T) {
 	db := New()
 	err := db.Open(context.Background(), os.Getenv("DB_URL"))
 	assert.Nil(t, err)
