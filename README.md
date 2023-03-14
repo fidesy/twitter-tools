@@ -8,7 +8,7 @@ Bot for tracking new user followings on Twitter with telegram bot.
 
 
 2. Subscribe on notifications of new followings
-3. Add/Delete users to track
+3. Add/Delete users to track (only available to admin)
 
 ### Screenshots
 

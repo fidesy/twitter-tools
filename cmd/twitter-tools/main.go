@@ -20,16 +20,18 @@ func main() {
 	checkError(err)
 	defer s.CloseDatabase()
 
-	var actions = make(chan string, 10)
+	var actions = make(chan string)
 
 	go s.TrackFollowings(actions)
 
-	bot, err := telegrambot.New(os.Getenv("TG_BOT_TOKEN"), s)
+	bot, err := telegrambot.New(&telegrambot.TelegramBotConfig{
+		Token:         os.Getenv("TG_BOT_TOKEN"),
+		AdminUsername: os.Getenv("ADMIN_USERNAME"),
+	}, s)
 	checkError(err)
 
 	err = bot.Start(actions)
 	checkError(err)
-
 }
 
 func checkError(err error) {

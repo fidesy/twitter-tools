@@ -8,27 +8,37 @@ import (
 	"strings"
 )
 
-const greetingMessage = "Welcome to Bot. \nHere are available commands:" +
+const greetingMessage = "Welcome to FundInsightsBot. \nHere are available commands:" +
 	"\n\n\t/subscribe - get notifications about followings" +
 	"\n\t/unsubscribe - disable notifications about followings" +
-	"\n\t/top - get top followings for the last 24hours." +
-	"\n\t/add USERNAME - add user to track" +
-	"\n\t/delete USERNAME - delete user from tracking"
+	"\n\t/top - get top followings for the last 24hours."
 
-type TelegramBot struct {
-	bot  *tgbotapi.BotAPI
-	serv *service.Service
+//"\n\t/add USERNAME - add user to track" +
+//"\n\t/delete USERNAME - delete user from tracking"
+
+type TelegramBotConfig struct {
+	Token         string
+	AdminUsername string
 }
 
-func New(token string, serv *service.Service) (*TelegramBot, error) {
-	bot, err := tgbotapi.NewBotAPI(token)
+type TelegramBot struct {
+	config *TelegramBotConfig
+	bot    *tgbotapi.BotAPI
+	serv   *service.Service
+}
+
+func New(config *TelegramBotConfig, serv *service.Service) (*TelegramBot, error) {
+	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
 		return nil, err
 	}
 
+	config.AdminUsername = strings.ToLower(config.AdminUsername)
+
 	return &TelegramBot{
-		bot:  bot,
-		serv: serv,
+		config: config,
+		bot:    bot,
+		serv:   serv,
 	}, nil
 }
 
@@ -89,6 +99,11 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 				msg.Text = result
 
 			case "add":
+				if !tg.isAdmin(update.Message.From.UserName) {
+					msg.Text = "You are not allowed to use this method."
+					break
+				}
+
 				if len(args) < 1 {
 					msg.Text = "Please provide username to add."
 					break
@@ -103,6 +118,11 @@ func (tg *TelegramBot) Start(actions <-chan string) error {
 				msg.Text = "Successfully added user."
 
 			case "delete":
+				if !tg.isAdmin(update.Message.From.UserName) {
+					msg.Text = "You are not allowed to use this method."
+					break
+				}
+
 				if len(args) < 1 {
 					msg.Text = "Please provide username to delete."
 					break
@@ -132,4 +152,8 @@ func (tg *TelegramBot) sendMessage(msg tgbotapi.MessageConfig) {
 	if err != nil {
 		log.Println("error while sending message:", err.Error())
 	}
+}
+
+func (tg *TelegramBot) isAdmin(username string) bool {
+	return tg.config.AdminUsername == strings.ToLower(username)
 }
